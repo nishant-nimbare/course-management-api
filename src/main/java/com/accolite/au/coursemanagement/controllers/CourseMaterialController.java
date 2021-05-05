@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,8 +44,14 @@ public class CourseMaterialController {
 		return cmService.getCourseMaterial(id);
 	}
 	
+	@GetMapping("/history/{id}")
+	public List<CourseMaterial> getMaterialHistory(@PathVariable("id") int id){
+		return cmService.getHistory(id);
+	}
+	
+	
 	@PostMapping("/")
-	public void createMaterial( @RequestParam("courseId") int courseId ,@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("file") MultipartFile file) {
+	public void createMaterial( @RequestParam(value="courseId", required=true) Integer courseId ,@RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("file") MultipartFile file) {
 		byte[] fileBytes;
 		
 		try {
@@ -62,21 +71,25 @@ public class CourseMaterialController {
 	
 	//form data
 	@PutMapping("/{id}")
-	public void updateMaterial(@PathVariable("id") int id, @RequestParam(value="courseId", required=false) int courseId ,@RequestParam(value="name", required=false) String name, @RequestParam(value="description", required=false) String description, @RequestParam(value="file", required=false) MultipartFile file) {
+	public void updateMaterial(@PathVariable("id") int id, @RequestParam(value="name", required=false) String name, @RequestParam(value="description", required=false) String description, @RequestParam(value="file", required=false) MultipartFile file) {
 byte[] fileBytes;
 		
+
+		CourseMaterial cm = new CourseMaterial();
+		
 		try {
-			fileBytes = file.getBytes();
+			if(file != null) {
+				fileBytes = file.getBytes();
+				cm.setFile(fileBytes);
+			}	
 		}catch(IOException e) {
 			LOGGER.warning("file upload failed "+ e.getMessage());
 			return;
 		}
 		
-		CourseMaterial cm = new CourseMaterial();
-		cm.setCourse_id(courseId);
 		cm.setName(name);
 		cm.setDescription(description);
-		cm.setFile(fileBytes);
+		
 		cmService.updateCourseMaterial(id, cm);		
 	}
 	
@@ -85,4 +98,25 @@ byte[] fileBytes;
 		cmService.deleteCourseMaterial(id);
 	}
 	
+	
+	@GetMapping("/download/{id}")
+	public HttpEntity<byte[]> downloadFile(@PathVariable("id") int id, @RequestParam(value="v", defaultValue="-1") int version) {
+		byte[] fileToDownload; 
+		String fileName =Integer.toString(id) ;
+		if(version == -1) {
+			fileToDownload = cmService.downloadLatest(id);
+		}else {
+			fileToDownload = cmService.downloadMaterial(id, version);
+			fileName = fileName + "_"+ Integer.toString(version);
+		}
+		
+		
+		HttpHeaders header = new HttpHeaders();
+	    header.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	    header.set(HttpHeaders.CONTENT_DISPOSITION,
+	                   "attachment; filename=" + fileName.replace(" ", "_"));
+	    header.setContentLength(fileToDownload.length);
+
+	    return new HttpEntity<byte[]>(fileToDownload, header);
+	}
 }

@@ -5,16 +5,18 @@ import java.sql.Timestamp;
 public class Course {
 
 	//TODO: add created by and updated by
-	private int id,location;
+	private int id;
 	private String name, description;
 	private Timestamp created_at,updated_at;
-	
-	public int getLocation() {
-		return location;
+	private CourseLocation courseLocation;
+
+
+	public CourseLocation getCourseLocation() {
+		return courseLocation;
 	}
 
-	public void setLocation(int location) {
-		this.location = location;
+	public void setCourseLocation(CourseLocation courseLocation) {
+		this.courseLocation = courseLocation;
 	}
 
 	public String getName() {
@@ -59,6 +61,6 @@ public class Course {
 
 	@Override
 	public String toString() {
-		return "Course [id=" + id + ", location=" + location + ", name=" + name + ", description=" + description + "]";
+		return "Course [id=" + id + ", location=" + courseLocation.getName() + ", name=" + name + ", description=" + description + "]";
 	}
 }

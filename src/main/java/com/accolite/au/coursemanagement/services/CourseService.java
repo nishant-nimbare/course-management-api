@@ -1,7 +1,9 @@
 package com.accolite.au.coursemanagement.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.accolite.au.coursemanagement.models.Course;
+import com.accolite.au.coursemanagement.repository.CourseRepository;
+import com.accolite.au.coursemanagement.repository.UserRepository;
 import com.accolite.au.coursemanagement.util.CourseRowMapper;
+import com.accolite.au.coursemanagement.util.UserCourseResponse;
 
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Service
@@ -21,33 +25,70 @@ public class CourseService {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	@Autowired
-	JdbcTemplate jdbcTemplate;
+	CourseRepository courseRepository;
+
+	@Autowired
+	UserRepository userRepo;
 	
 	public List<Course> getAllCourses(){
-		String sql = "select id, name, description, location_id, created_at, created_by, updated_at, updated_by  from course;";
-		return (List<Course>) jdbcTemplate.query(sql,new CourseRowMapper());
+		return courseRepository.getAllCourses();
+	}
+	
+	public List<Course> getAllCourses(String search){
+		if(search==null || search.equals("")) {
+			return this.getAllCourses();
+		}
+		return courseRepository.searchCourses(search.trim());
+	}
+	
+	public List<UserCourseResponse> getStudentCourses(String studentId, String search){
+		
+		List<Course> allCourses = this.getAllCourses(search);
+		//List<Integer> enrolledCourses = userRepo.getEnrolledCourses(studentId);
+		
+		Set<Integer> enrolledCourses  = new HashSet<Integer>(userRepo.getEnrolledCourses(studentId));
+		
+		LOGGER.info("user enrolled courses "+ enrolledCourses);
+		
+		List<UserCourseResponse> res = new ArrayList<>(allCourses.size());
+
+		for(Course c : allCourses) {
+			UserCourseResponse n = UserCourseResponse.fromCourse(c); 
+			
+			if(enrolledCourses.contains(c.getId())) {
+				n.setEnrolled(true);
+			}
+			res.add(n);
+		}
+		return res;
 	}
 	
 	
 	public Course getCourse(int id) {
-		String sql = "select id, name, description, location_id, created_at, created_by, updated_at, updated_by from course where id= ? ;";
 		try {
-			return  (Course)jdbcTemplate.queryForObject(sql, new CourseRowMapper(), new Object[] { id });
+			return courseRepository.getCourse(id);
 		}catch(EmptyResultDataAccessException e) {
 			return null;
 		}
-		
 	}
 	
+	public UserCourseResponse getCourseStudent(int courseId, String userId) {
+		try {
+			Course c = courseRepository.getCourse(courseId);
+			UserCourseResponse res = UserCourseResponse .fromCourse(c);
+			if(userRepo.isEnrolled(userId, courseId)) {
+				res.setEnrolled(true);
+			}
+			return res;
+		}catch(EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
 	
 	public boolean createCourse(Course c) {
 		//TODO: add created and updated by
 		try {
-			
-			String sql = "INSERT INTO course (name, description, location_id) VALUES ( ?, ?, ?);";
-			int ra = jdbcTemplate.update(sql, c.getName(), c.getDescription(), c.getLocation());
-			return (ra==1);
-
+			return courseRepository.createCourse(c);
 		}catch(DataAccessException e) {
 			LOGGER.warning(e.getMessage());
 			//TODO:handle error
@@ -60,31 +101,7 @@ public class CourseService {
 		//TODO: add created and updated by
 		
 		try {
-			StringBuilder sqlb = new StringBuilder(" update course set ");
-			
-			ArrayList<String> updates = new ArrayList<>(3);
-			
-			if(c.getName() != null && !c.getName().equals("")) {
-				updates.add( new StringBuilder().append(" name='").append(c.getName()).append("' ").toString() );
-			}
-			
-			if(c.getDescription() != null && !c.getDescription().equals("")) {
-				updates.add( new StringBuilder().append(" description='").append(c.getDescription()).append("' ").toString() );
-			}
-			
-			if(c.getLocation() != 0) {
-				updates.add( new StringBuilder().append(" location_id=").append(c.getLocation()).append(" ").toString() );
-			}
-
-			sqlb.append(updates.stream().collect(Collectors.joining(",")));
-			
-			sqlb.append(" where id=").append(id).append(";");
-			
-			LOGGER.info("update query : "+ sqlb.toString());
-			int ra = jdbcTemplate.update(sqlb.toString());
-			
-			return (ra==1);
-		
+			return courseRepository.updateCourse(id, c);
 		}catch(DataAccessException e) {
 			LOGGER.warning(e.getMessage());
 			//TODO:handle error
@@ -94,11 +111,7 @@ public class CourseService {
 	
 	public boolean deleteCourse(int id) {
 		try {
-			String sql = "delete from course where id= ? ;";
-			
-			int ra = jdbcTemplate.update(sql, id);
-			
-			return (ra==1);
+			return courseRepository.deleteCourse(id);
 		}catch(DataAccessException e) {
 			LOGGER.warning(e.getMessage());
 			//TODO:handle error
@@ -108,8 +121,26 @@ public class CourseService {
 	
 	public List<String> skillsOfCourse(int id){
 		try {
-			String sql = "select skill from course_skills where course_id= ? ;";
-			return (List<String>)jdbcTemplate.queryForList(sql, String.class, new Object[] { id } );
+			return courseRepository.skillsOfCourse(id);
+		}catch(DataAccessException e) {
+			LOGGER.warning(e.getMessage());
+			throw e;
+		}
+	}
+	
+	public boolean addSkill(int courseId, String skill) {
+		try {
+			return courseRepository.addSkill(courseId, skill);
+		}catch(DataAccessException e) {
+			LOGGER.warning(e.getMessage());
+			throw e;
+		}
+	}
+	
+	public boolean removeSkill(int courseId, String skill) {
+		try {
+			return courseRepository.removeSkill(courseId, skill);
+
 		}catch(DataAccessException e) {
 			LOGGER.warning(e.getMessage());
 			throw e;
@@ -118,12 +149,31 @@ public class CourseService {
 	
 	public List<String> prerequisitesOfCourse(int id){
 		try {
-			String sql = "select prerequisite from course_prerequisites where course_id= ? ;";
-			return (List<String>)jdbcTemplate.queryForList(sql, String.class, new Object[] { id } );
+			return courseRepository.prerequisitesOfCourse(id);
 		}catch(DataAccessException e) {
 			LOGGER.warning(e.getMessage());
 			throw e;
 		}
 	}
+	
+	public boolean addPrerequisite(int courseId, String prerequisite) {
+		try {
+			return courseRepository.addPrerequisite(courseId, prerequisite);
+		}catch(DataAccessException e) {
+			LOGGER.warning(e.getMessage());
+			throw e;
+		}
+	}
+	
+	public boolean removeprerequisite(int courseId, String prerequisite) {
+		try {
+			return courseRepository.removeprerequisite(courseId, prerequisite);
+		}catch(DataAccessException e) {
+			LOGGER.warning(e.getMessage());
+			throw e;
+		}
+	}
+	
+	
 	
 }

@@ -19,9 +19,15 @@ public class CourseMaterialRowMapper implements RowMapper<CourseMaterial>{
 		cm.setName(rs.getString("name"));
 		cm.setDescription(rs.getString("description"));
 		cm.setCourse_id(rs.getInt("course_id"));
-		cm.setFile(rs.getBytes("file"));
+		
 		cm.setCreated_at(rs.getTimestamp("created_at"));
 		cm.setUpdated_at(rs.getTimestamp("updated_at"));
+		
+		try {
+			cm.setFile(rs.getBytes("file"));
+		}catch(SQLException e) {
+			
+		}
 		
 		return cm;
 	}

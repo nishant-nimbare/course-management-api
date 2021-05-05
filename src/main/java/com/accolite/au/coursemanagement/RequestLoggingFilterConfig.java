@@ -1,3 +1,4 @@
+package com.accolite.au.coursemanagement;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
