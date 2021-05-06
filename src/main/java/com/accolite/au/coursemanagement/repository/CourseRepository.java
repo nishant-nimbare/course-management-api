@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -48,25 +47,15 @@ public class CourseRepository {
 	
 	
 	public boolean createCourse(Course c) {
-		//TODO: add created and updated by
-		try {
-			
 			String sql = "INSERT INTO course (name, description, location_id) VALUES ( ?, ?, ?);";
 			int ra = jdbcTemplate.update(sql, c.getName(), c.getDescription(), c.getCourseLocation().getId());
 			return (ra==1);
 
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
 		
 	}
 	
 	public boolean updateCourse(int id, Course c) {
-		//TODO: add created and updated by
 		
-		try {
 			StringBuilder sqlb = new StringBuilder(" update course set ");
 			
 			ArrayList<String> updates = new ArrayList<>(3);
@@ -92,25 +81,13 @@ public class CourseRepository {
 			
 			return (ra==1);
 		
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
 	}
 	
 	public boolean deleteCourse(int id) {
-		try {
-			String sql = "delete from course where id= ? ;";
-			
+			String sql = "delete from course where id= ? ;";	
 			int ra = jdbcTemplate.update(sql, id);
-			
 			return (ra==1);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
+		
 	}
 	
 	public List<String> skillsOfCourse(int id){
@@ -119,34 +96,20 @@ public class CourseRepository {
 			return (List<String>)jdbcTemplate.queryForList(sql, String.class, new Object[] { id } );
 		}catch(EmptyResultDataAccessException e) {
 			return null;
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
 		}
 	}
 	
 	public boolean addSkill(int courseId, String skill) {
-		try {
 			String sql = "insert into course_skills values ( ?, ?);";
 			int ra = jdbcTemplate.update(sql, courseId, skill);
 			return (ra==1);
-
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
 	}
 	
 	public boolean removeSkill(int courseId, String skill) {
-		try {
 			String sql = "delete from course_skills where course_id= ? and  skill= ? ;";
 			int ra = jdbcTemplate.update(sql, courseId, skill);
 			return (ra==1);
 
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
 	}
 	
 	public List<String> prerequisitesOfCourse(int id){
@@ -155,34 +118,21 @@ public class CourseRepository {
 			return (List<String>)jdbcTemplate.queryForList(sql, String.class, new Object[] { id } );
 		}catch(EmptyResultDataAccessException e) {
 			return null;
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
 		}
 	}
 	
 	public boolean addPrerequisite(int courseId, String prerequisite) {
-		try {
 			String sql = "insert into course_prerequisites values ( ?, ?);";
 			int ra = jdbcTemplate.update(sql, courseId, prerequisite);
 			return (ra==1);
 
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
 	}
 	
 	public boolean removeprerequisite(int courseId, String prerequisite) {
-		try {
 			String sql = "delete from course_prerequisites where course_id= ? and  prerequisite= ? ;";
 			int ra = jdbcTemplate.update(sql, courseId, prerequisite);
 			return (ra==1);
 
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
 	}
 
 	

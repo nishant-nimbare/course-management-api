@@ -6,6 +6,18 @@ public class User {
 	private String email,name;
 	private Timestamp created_at; 
 	private UserRole role;
+	
+	
+	public User() {
+		super();
+	}
+	public User(String email, String name, Timestamp created_at, UserRole role) {
+		super();
+		this.email = email;
+		this.name = name;
+		this.created_at = created_at;
+		this.role = role;
+	}
 	public String getEmail() {
 		return email;
 	}

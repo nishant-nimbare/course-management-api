@@ -24,59 +24,30 @@ public class CourseLocationService {
 
 	//get all
 	public List<CourseLocation> getLocations(){
-		try {
-			
 			return locationRepository.getLocations();
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
 	}
 	
 	//get single
 	public CourseLocation getLocation(int id) {
-		try {
-			return locationRepository.getLocation(id);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return locationRepository.getLocation(id);
 	}
 	
 	
 	//create location
 	public CourseLocation createLocation(String name) {
-		try {
-			return locationRepository.createLocation(name);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
-			
+		return locationRepository.createLocation(name);		
 	}
 	
 	
 	//update location
 	public CourseLocation updateLocation(int id, String name) {
-		
-		try {
-			return locationRepository.updateLocation(id, name);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return locationRepository.updateLocation(id, name);
 	}
 	
 	//delete location
 	
 	public boolean deleteLocation(int id) {
-		try {
-			return locationRepository.deleteLocation(id);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
+		return locationRepository.deleteLocation(id);
 	}
 	
 }

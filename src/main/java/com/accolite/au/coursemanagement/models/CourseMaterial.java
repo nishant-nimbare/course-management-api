@@ -8,10 +8,27 @@ public class CourseMaterial {
 	private int id,course_id, version;
 	private String name, description;
 	
-
 	private Timestamp created_at,updated_at;
 	private byte[] file;
 	
+	
+	public CourseMaterial() {
+		super();
+	}
+	
+	public CourseMaterial(int id, int course_id, int version, String name, String description, byte[] file) {
+		super();
+		this.id = id;
+		this.course_id = course_id;
+		this.version = version;
+		this.name = name;
+		this.description = description;
+		this.file = file;
+	}
+
+
+
+
 	public int getId() {
 		return id;
 	}

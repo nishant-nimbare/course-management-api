@@ -30,34 +30,17 @@ public class UserRepository {
 		}	
 	}
 	
-	public boolean createUser(User u) {
-		//TODO: add created and updated by
-		try {
-			
+	public boolean createUser(User u) {			
 			String sql = "INSERT INTO user (email, name) VALUES ( ?, ?);";
 			int ra = jdbcTemplate.update(sql, u.getEmail(), u.getName());
 			return (ra==1);
-
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
-
 	}
 	
 	public boolean enroll(String userId, int courseId) {
-		try {
 			String sql = "INSERT INTO enrollment (user, course_id) VALUES ( ?, ?);";
 			LOGGER.info(sql + " "+ userId+" "+ courseId);
 			int ra = jdbcTemplate.update(sql, userId, courseId);
 			return (ra==1);
-
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
 	}
 	
 	public List<Integer> getEnrolledCourses(String userId){
@@ -72,17 +55,11 @@ public class UserRepository {
 	
 	
 	public boolean isEnrolled(String userId, int courseId) {
-		try {
 			String sql = "SELECT EXISTS(SELECT * FROM enrollment WHERE user=? AND course_id=? )";
 			LOGGER.info(sql + " "+ userId+" "+ courseId);
 			int ra = jdbcTemplate.queryForObject(sql, Integer.class, userId, courseId);
 			return (ra==1);
 
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
 	}
 	
 }

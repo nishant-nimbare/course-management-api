@@ -1,7 +1,21 @@
 package com.accolite.au.coursemanagement.models;
 
 public class CourseLocation {
-		public int getId() {
+	int id;
+	String name;
+	
+	
+	public CourseLocation() {
+		super();
+	}
+
+	public CourseLocation(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+	
+	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
@@ -13,6 +27,4 @@ public class CourseLocation {
 	public void setName(String name) {
 		this.name = name;
 	}
-		int id;
-		String name;
 }

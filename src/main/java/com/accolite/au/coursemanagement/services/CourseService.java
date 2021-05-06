@@ -5,20 +5,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.accolite.au.coursemanagement.models.Course;
 import com.accolite.au.coursemanagement.repository.CourseRepository;
 import com.accolite.au.coursemanagement.repository.UserRepository;
-import com.accolite.au.coursemanagement.util.CourseRowMapper;
 import com.accolite.au.coursemanagement.util.UserCourseResponse;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
+ 
 @Service
 public class CourseService {
 
@@ -68,6 +64,7 @@ public class CourseService {
 		try {
 			return courseRepository.getCourse(id);
 		}catch(EmptyResultDataAccessException e) {
+			LOGGER.warning("no course found for id "+ id);
 			return null;
 		}
 	}
@@ -81,99 +78,46 @@ public class CourseService {
 			}
 			return res;
 		}catch(EmptyResultDataAccessException e) {
+			LOGGER.warning("no course found for course id "+ courseId);
 			return null;
 		}
 	}
 	
 	public boolean createCourse(Course c) {
-		//TODO: add created and updated by
-		try {
-			return courseRepository.createCourse(c);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
-		
+		return courseRepository.createCourse(c);
 	}
 	
 	public boolean updateCourse(int id, Course c) {
-		//TODO: add created and updated by
-		
-		try {
-			return courseRepository.updateCourse(id, c);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
+		return courseRepository.updateCourse(id, c);
 	}
 	
 	public boolean deleteCourse(int id) {
-		try {
-			return courseRepository.deleteCourse(id);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			//TODO:handle error
-			throw e;
-		}
+		return courseRepository.deleteCourse(id);
 	}
 	
 	public List<String> skillsOfCourse(int id){
-		try {
-			return courseRepository.skillsOfCourse(id);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return courseRepository.skillsOfCourse(id);	
 	}
 	
 	public boolean addSkill(int courseId, String skill) {
-		try {
-			return courseRepository.addSkill(courseId, skill);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return courseRepository.addSkill(courseId, skill);
 	}
 	
 	public boolean removeSkill(int courseId, String skill) {
-		try {
-			return courseRepository.removeSkill(courseId, skill);
-
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return courseRepository.removeSkill(courseId, skill);
 	}
 	
 	public List<String> prerequisitesOfCourse(int id){
-		try {
-			return courseRepository.prerequisitesOfCourse(id);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return courseRepository.prerequisitesOfCourse(id);
+		
 	}
 	
 	public boolean addPrerequisite(int courseId, String prerequisite) {
-		try {
-			return courseRepository.addPrerequisite(courseId, prerequisite);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return courseRepository.addPrerequisite(courseId, prerequisite);
 	}
 	
 	public boolean removeprerequisite(int courseId, String prerequisite) {
-		try {
-			return courseRepository.removeprerequisite(courseId, prerequisite);
-		}catch(DataAccessException e) {
-			LOGGER.warning(e.getMessage());
-			throw e;
-		}
+		return courseRepository.removeprerequisite(courseId, prerequisite);
 	}
-	
-	
 	
 }

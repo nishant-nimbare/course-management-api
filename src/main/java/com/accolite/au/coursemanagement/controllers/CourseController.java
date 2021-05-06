@@ -20,8 +20,6 @@ import com.accolite.au.coursemanagement.models.CourseMaterial;
 import com.accolite.au.coursemanagement.models.UserRole;
 import com.accolite.au.coursemanagement.services.CourseMaterialService;
 import com.accolite.au.coursemanagement.services.CourseService;
-import com.accolite.au.coursemanagement.services.PrerequisiteService;
-import com.accolite.au.coursemanagement.services.SkillsService;
 import com.accolite.au.coursemanagement.util.UserCourseResponse;
 
 @RestController

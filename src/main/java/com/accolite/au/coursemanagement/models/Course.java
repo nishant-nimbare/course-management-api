@@ -11,6 +11,28 @@ public class Course {
 	private CourseLocation courseLocation;
 
 
+	public Course(int id, String name, String description) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+	}
+
+	public Course(int id, String name, String description, Timestamp created_at, Timestamp updated_at,
+			CourseLocation courseLocation) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.created_at = created_at;
+		this.updated_at = updated_at;
+		this.courseLocation = courseLocation;
+	}
+
+	public Course() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public CourseLocation getCourseLocation() {
 		return courseLocation;
 	}
